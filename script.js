@@ -37,10 +37,28 @@ const replayBtn = document.getElementById('replay-btn');
 const songSelect = document.getElementById('song-select');
 const themeSelect = document.getElementById('theme-select');
 
-let width = canvas.width = window.innerWidth;
-let height = canvas.height = window.innerHeight;
+let width = window.innerWidth;
+let height = window.innerHeight;
+let dpr = window.devicePixelRatio || 1;
 let isMobile = width < 600;
 let currentTheme = "theme-sakura";
+
+// SETTING CANVAS HD DENGAN DEVICE PIXEL RATIO
+function resizeCanvas() {
+    width = window.innerWidth;
+    height = window.innerHeight;
+    dpr = window.devicePixelRatio || 1;
+    isMobile = width < 600;
+
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    canvas.style.width = width + 'px';
+    canvas.style.height = height + 'px';
+
+    ctx.scale(dpr, dpr);
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
 
 const loadedImages = [];
 PHOTO_LIST.forEach(src => {
@@ -61,7 +79,7 @@ for (let i = 0; i < (isMobile ? 15 : 30); i++) {
     });
 }
 
-// PARTIKEL MELAYANG SESUAI TEMA
+// PARTIKEL MELAYANG
 const themeParticles = [];
 const particleCount = isMobile ? 8 : 15;
 
@@ -77,12 +95,6 @@ for (let i = 0; i < particleCount; i++) {
     });
 }
 
-window.addEventListener('resize', () => {
-    width = canvas.width = window.innerWidth;
-    height = canvas.height = window.innerHeight;
-    isMobile = width < 600;
-});
-
 let currentLyrics = SONG_DATABASE.song1.lyrics;
 let activeHearts = [];
 let floatingPhotos = [];
@@ -94,13 +106,11 @@ let isPlaying = false;
 let isFinished = false;
 let currentSide = 'left';
 
-// Event Ganti Tema & Karakter Partikel
 themeSelect.addEventListener('change', (e) => {
     currentTheme = e.target.value;
     document.body.className = currentTheme;
 });
 
-// Event Ganti Lagu
 songSelect.addEventListener('change', (e) => {
     let selectedSongKey = e.target.value;
     audio.src = SONG_DATABASE[selectedSongKey].src;
@@ -126,8 +136,8 @@ class TrailHeart {
         ctx.save();
         ctx.globalAlpha = Math.max(0, this.alpha);
         ctx.fillStyle = currentTheme === 'theme-forest' ? '#70e000' : (currentTheme === 'theme-galaxy' ? '#00b4d8' : '#ff8fa3');
-        ctx.font = `${this.size}px Helvetica`;
-        ctx.fillText("♥", this.x, this.y);
+        ctx.font = `${this.size}px Helvetica, Arial, sans-serif`;
+        ctx.fillText("♥", Math.round(this.x), Math.round(this.y));
         ctx.restore();
     }
 }
@@ -148,7 +158,7 @@ function playAudioWithFadeIn() {
     }, 100);
 }
 
-// BALON HATI LIRIK (UKURAN DIPERKECIL UNTUK HP)
+// BALON HATI LIRIK (HD & SMOOTH MOVEMENT)
 class HeartCard {
     constructor(text, x, y) {
         this.fullText = text;
@@ -157,7 +167,6 @@ class HeartCard {
         this.y = y;
         this.typewriterIndex = 0;
         this.speed = 65;
-        // Skala diperkecil dari 6 jadi 4.2 khusus HP biar gak nutupin layar
         this.scale = isMobile ? 4.2 : 6.5; 
         
         this.typeInterval = setInterval(() => {
@@ -172,7 +181,8 @@ class HeartCard {
 
     draw() {
         ctx.save();
-        ctx.translate(this.x, this.y);
+        // Pembulatan posisi koordinat (Math.round) cegah teks geter
+        ctx.translate(Math.round(this.x), Math.round(this.y));
 
         let heartColor = "#ff6584";
         if (currentTheme === "theme-galaxy") heartColor = "#3a86ff";
@@ -202,7 +212,7 @@ class HeartCard {
 
         ctx.shadowBlur = 0;
         ctx.fillStyle = "#FFFFFF";
-        ctx.font = isMobile ? "bold 10px Helvetica" : "bold 13px Helvetica";
+        ctx.font = isMobile ? "bold 11px system-ui, -apple-system, sans-serif" : "bold 13px system-ui, -apple-system, sans-serif";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         
@@ -227,7 +237,7 @@ class HeartCard {
 
         let startY = y - ((lines.length - 1) * lineHeight) / 2;
         for (let k = 0; k < lines.length; k++) {
-            ctx.fillText(lines[k], x, startY + (k * lineHeight));
+            ctx.fillText(lines[k], x, Math.round(startY + (k * lineHeight)));
         }
     }
 }
@@ -249,7 +259,6 @@ class FloatingPhoto {
             this.w = maxDimension * aspect;
         }
 
-        // Foto dimunculkan tepat di area tengah layar HP
         this.x = width / 2;
         this.vx = (Math.random() - 0.5) * 10;
         this.y = height + 100;
@@ -267,7 +276,7 @@ class FloatingPhoto {
         if (!this.img.complete) return;
 
         ctx.save();
-        ctx.translate(this.x, this.y);
+        ctx.translate(Math.round(this.x), Math.round(this.y));
         ctx.rotate(this.rotation);
 
         let padding = 5;
@@ -306,8 +315,8 @@ class NoteParticle {
 
     draw() {
         ctx.fillStyle = "#ffffff";
-        ctx.font = `${this.size}px Helvetica`;
-        ctx.fillText(this.char, this.x, this.y);
+        ctx.font = `${this.size}px system-ui, -apple-system, sans-serif`;
+        ctx.fillText(this.char, Math.round(this.x), Math.round(this.y));
     }
 }
 
@@ -328,6 +337,7 @@ function replayAudioAndLyrics() {
 
 function animate(now) {
     let dt = (now - lastTime) / 1000;
+    if (dt > 0.1) dt = 0.1; // Cap delta time biar pergerakan stabil jika ada lag
     lastTime = now;
 
     ctx.clearRect(0, 0, width, height);
@@ -338,7 +348,7 @@ function animate(now) {
         if (star.alpha > 1 || star.alpha < 0.2) star.speed = -star.speed;
         ctx.fillStyle = `rgba(255, 255, 255, ${Math.abs(star.alpha)})`;
         ctx.beginPath();
-        ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+        ctx.arc(Math.round(star.x), Math.round(star.y), star.size, 0, Math.PI * 2);
         ctx.fill();
     });
 
@@ -349,8 +359,8 @@ function animate(now) {
         if (p.y > height + 20) { p.y = -20; p.x = Math.random() * width; }
 
         ctx.save();
-        ctx.translate(p.x, p.y);
-        ctx.font = `${p.size}px Helvetica`;
+        ctx.translate(Math.round(p.x), Math.round(p.y));
+        ctx.font = `${p.size}px system-ui, -apple-system, sans-serif`;
 
         if (currentTheme === "theme-sakura") ctx.fillText("🌸", 0, 0);
         else if (currentTheme === "theme-galaxy") ctx.fillText("✨", 0, 0);
@@ -370,7 +380,7 @@ function animate(now) {
     if (isPlaying) {
         let currentTime = audio.currentTime;
 
-        // Lirik Zigzag (Diarahkan lebih ke pinggir kiri & kanan biar foto di tengah kelihatan)
+        // Lirik Zigzag
         if (nextLyricIdx < currentLyrics.length && currentTime >= currentLyrics[nextLyricIdx].t) {
             let offset = isMobile ? (width * 0.28) : 150;
             let heartX = (currentSide === 'left') ? (width / 2 - offset) : (width / 2 + offset);
@@ -409,7 +419,6 @@ function animate(now) {
         if (p.y < -50) noteParticles.splice(idx, 1);
     });
 
-    // Ditarik FOTO dulu baru BALON HATI (Biar foto berada di belakang balon jika bersentuhan)
     floatingPhotos.forEach((ph, idx) => {
         ph.update(dt);
         ph.draw();
