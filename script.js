@@ -148,7 +148,7 @@ function playAudioWithFadeIn() {
     }, 100);
 }
 
-// BALON HATI LIRIK (ZIGZAG)
+// BALON HATI LIRIK (UKURAN DIPERKECIL UNTUK HP)
 class HeartCard {
     constructor(text, x, y) {
         this.fullText = text;
@@ -157,7 +157,8 @@ class HeartCard {
         this.y = y;
         this.typewriterIndex = 0;
         this.speed = 65;
-        this.scale = isMobile ? 6 : 7.5;
+        // Skala diperkecil dari 6 jadi 4.2 khusus HP biar gak nutupin layar
+        this.scale = isMobile ? 4.2 : 6.5; 
         
         this.typeInterval = setInterval(() => {
             if (this.typewriterIndex < this.fullText.length) {
@@ -179,7 +180,7 @@ class HeartCard {
         if (currentTheme === "theme-sunset") heartColor = "#f4a261";
 
         ctx.shadowColor = heartColor;
-        ctx.shadowBlur = 12;
+        ctx.shadowBlur = 10;
 
         ctx.beginPath();
         for (let i = 0; i < 360; i += 10) {
@@ -196,16 +197,16 @@ class HeartCard {
         ctx.fillStyle = heartColor;
         ctx.fill();
         ctx.strokeStyle = "#ffffff";
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 1.5;
         ctx.stroke();
 
         ctx.shadowBlur = 0;
         ctx.fillStyle = "#FFFFFF";
-        ctx.font = isMobile ? "bold 12px Helvetica" : "bold 14px Helvetica";
+        ctx.font = isMobile ? "bold 10px Helvetica" : "bold 13px Helvetica";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         
-        this.wrapText(this.displayText, 0, 0, isMobile ? 140 : 180, 18);
+        this.wrapText(this.displayText, 0, 0, isMobile ? 95 : 150, 14);
         ctx.restore();
     }
 
@@ -237,7 +238,7 @@ class FloatingPhoto {
         this.img = img;
         this.rotation = (Math.random() - 0.5) * 0.3;
         
-        let maxDimension = isMobile ? 80 : 120;
+        let maxDimension = isMobile ? 90 : 130;
         let aspect = (img.width && img.height) ? (img.width / img.height) : 1;
 
         if (aspect >= 1) {
@@ -248,15 +249,9 @@ class FloatingPhoto {
             this.w = maxDimension * aspect;
         }
 
-        let isLeft = Math.random() < 0.5;
-        if (isLeft) {
-            this.x = 35 + Math.random() * 20;
-            this.vx = 4 + Math.random() * 6;
-        } else {
-            this.x = width - (35 + Math.random() * 20);
-            this.vx = -(4 + Math.random() * 6);
-        }
-
+        // Foto dimunculkan tepat di area tengah layar HP
+        this.x = width / 2;
+        this.vx = (Math.random() - 0.5) * 10;
         this.y = height + 100;
         this.vy = -(45 + Math.random() * 15);
     }
@@ -292,7 +287,7 @@ class FloatingPhoto {
     }
 }
 
-// PARTIKEL NOT / SIMBOL MUSIK
+// PARTIKEL NOT MUSIK
 class NoteParticle {
     constructor() {
         let symbols = ["♪", "♫", "♥"];
@@ -347,7 +342,7 @@ function animate(now) {
         ctx.fill();
     });
 
-    // PARTIKEL KHAS SESUAI TEMA
+    // Partikel Tema
     themeParticles.forEach(p => {
         p.y += p.speedY;
         p.x += p.speedX;
@@ -375,9 +370,9 @@ function animate(now) {
     if (isPlaying) {
         let currentTime = audio.currentTime;
 
-        // Lirik Zigzag
+        // Lirik Zigzag (Diarahkan lebih ke pinggir kiri & kanan biar foto di tengah kelihatan)
         if (nextLyricIdx < currentLyrics.length && currentTime >= currentLyrics[nextLyricIdx].t) {
-            let offset = isMobile ? 55 : 130;
+            let offset = isMobile ? (width * 0.28) : 150;
             let heartX = (currentSide === 'left') ? (width / 2 - offset) : (width / 2 + offset);
 
             activeHearts.push(new HeartCard(currentLyrics[nextLyricIdx].text, heartX, height - 80));
@@ -386,14 +381,14 @@ function animate(now) {
         }
 
         // Foto Melayang
-        if (loadedImages.length > 0 && now - lastPhotoSpawn > 6000) {
+        if (loadedImages.length > 0 && now - lastPhotoSpawn > 5000) {
             let currentImg = loadedImages[photoIndex % loadedImages.length];
             floatingPhotos.push(new FloatingPhoto(currentImg));
             photoIndex++;
             lastPhotoSpawn = now;
         }
 
-        // Spawning Not Musik
+        // Not Musik
         if (now - lastParticleSpawn > 1200) {
             noteParticles.push(new NoteParticle());
             lastParticleSpawn = now;
@@ -414,6 +409,7 @@ function animate(now) {
         if (p.y < -50) noteParticles.splice(idx, 1);
     });
 
+    // Ditarik FOTO dulu baru BALON HATI (Biar foto berada di belakang balon jika bersentuhan)
     floatingPhotos.forEach((ph, idx) => {
         ph.update(dt);
         ph.draw();
