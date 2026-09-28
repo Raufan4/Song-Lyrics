@@ -1,0 +1,114 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    position: relative;
+    touch-action: manipulation;
+    transition: background 1s ease;
+}
+
+/* TEMA BACKGROUND */
+body.theme-sakura {
+    background: linear-gradient(180deg, #2a082b 0%, #63234d 40%, #a84b72 75%, #d87093 100%);
+}
+
+body.theme-galaxy {
+    background: linear-gradient(180deg, #020024 0%, #090979 50%, #002244 100%);
+}
+
+body.theme-forest {
+    background: linear-gradient(180deg, #05190e 0%, #133c24 50%, #224d2d 100%);
+}
+
+body.theme-sunset {
+    background: linear-gradient(180deg, #2b0b1e 0%, #721b3e 40%, #c44536 75%, #ed974b 100%);
+}
+
+/* CONTROL PANEL BAR */
+.control-panel {
+    position: absolute;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    z-index: 100;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    padding: 8px 16px;
+    border-radius: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    max-width: 95vw;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.control-panel select {
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: bold;
+    color: #333;
+    font-size: 13px;
+    outline: none;
+    cursor: pointer;
+}
+
+/* DEKORASI BACKGROUND */
+.mountain-bg {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 35vh;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.4;
+}
+
+/* STYLING TOMBOL */
+.action-btn {
+    position: absolute;
+    top: 55%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 16px 32px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(45deg, #ff8da1, #ff5376);
+    border: 2px solid #ffc2d1;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 0 25px rgba(255, 141, 161, 0.8);
+    z-index: 100;
+    transition: all 0.3s ease;
+    animation: pulseBtn 2s infinite;
+}
+
+.action-btn:hover {
+    transform: translate(-50%, -50%) scale(1.08);
+}
+
+#replay-btn {
+    display: none;
+}
+
+@keyframes pulseBtn {
+    0% { box-shadow: 0 0 15px rgba(255, 141, 161, 0.5); }
+    50% { box-shadow: 0 0 30px rgba(255, 141, 161, 0.9); }
+    100% { box-shadow: 0 0 15px rgba(255, 141, 161, 0.5); }
+}
+
+canvas {
+    display: block;
+    position: relative;
+    z-index: 10;
+}

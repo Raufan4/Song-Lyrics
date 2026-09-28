@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Floating Heart Lyrics & Dynamic Themes</title>
+    <!-- MENGHUBUNGKAN KE CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="theme-sakura">
+
+    <!-- PANEL OPSIONAL LAGU & TEMA -->
+    <div class="control-panel">
+        <select id="song-select">
+            <option value="song1">🎵 Lagu 1 - Please Don't Call</option>
+            <option value="song2">🎵 Lagu 2 - Judul Lagu Kedua</option>
+        </select>
+
+        <select id="theme-select">
+            <option value="theme-sakura">🌸 Tema: Sakura Pink</option>
+            <option value="theme-galaxy">🌌 Tema: Galaxy Blue</option>
+            <option value="theme-forest">🌿 Tema: Forest Fireflies</option>
+            <option value="theme-sunset">🌆 Tema: Sunset Warm</option>
+        </select>
+    </div>
+
+    <!-- SILUET GUNUNG BACKGROUND -->
+    <svg class="mountain-bg" viewBox="0 0 1200 300" preserveAspectRatio="none">
+        <path d="M0,300 L0,180 Q150,120 350,200 T700,150 T1050,220 T1200,160 L1200,300 Z" fill="#110312"/>
+        <path d="M0,300 L0,220 Q200,160 450,240 T850,180 T1200,230 L1200,300 Z" fill="#060107"/>
+    </svg>
+
+    <!-- TOMBOL INTERAKSI -->
+    <button id="start-btn" class="action-btn">✨ Klik untuk Putar Lagu & Lirik ✨</button>
+    <button id="replay-btn" class="action-btn">🔄 Putar Ulang ❤️</button>
+
+    <!-- ELEMEN AUDIO & CANVAS -->
+    <audio id="audio" src="lagu1.mp3"></audio>
+    <canvas id="canvas"></canvas>
+
+    <!-- MENGHUBUNGKAN KE JAVASCRIPT -->
+    <script src="script.js"></script>
+</body>
+</html>
