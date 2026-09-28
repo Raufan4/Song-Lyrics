@@ -111,11 +111,29 @@ themeSelect.addEventListener('change', (e) => {
     document.body.className = currentTheme;
 });
 
+// ==========================================
+// EVENT GANTI LAGU (TIDAK LANGSUNG AUTOPLAY)
+// ==========================================
 songSelect.addEventListener('change', (e) => {
     let selectedSongKey = e.target.value;
+    
+    // Stop & reset audio
+    audio.pause();
+    audio.currentTime = 0;
     audio.src = SONG_DATABASE[selectedSongKey].src;
     currentLyrics = SONG_DATABASE[selectedSongKey].lyrics;
-    if (isPlaying) replayAudioAndLyrics();
+
+    // Reset status & bersihkan kanvas dari animasi sebelumnya
+    isPlaying = false;
+    isFinished = false;
+    nextLyricIdx = 0;
+    photoIndex = 0;
+    activeHearts = [];
+    floatingPhotos = [];
+
+    // Sembunyikan tombol replay (kalau ada) & tampilkan tombol Start/Play
+    replayBtn.style.display = 'none';
+    startBtn.style.display = 'block';
 });
 
 // Trail Kursor Touch
@@ -181,7 +199,6 @@ class HeartCard {
 
     draw() {
         ctx.save();
-        // Pembulatan posisi koordinat (Math.round) cegah teks geter
         ctx.translate(Math.round(this.x), Math.round(this.y));
 
         let heartColor = "#ff6584";
@@ -337,7 +354,7 @@ function replayAudioAndLyrics() {
 
 function animate(now) {
     let dt = (now - lastTime) / 1000;
-    if (dt > 0.1) dt = 0.1; // Cap delta time biar pergerakan stabil jika ada lag
+    if (dt > 0.1) dt = 0.1;
     lastTime = now;
 
     ctx.clearRect(0, 0, width, height);
