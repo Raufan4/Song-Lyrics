@@ -1,3 +1,4 @@
+// ASET FOTO KUCING
 const PHOTO_LIST = ["foto1.jpg", "foto2.jpg", "foto3.jpg", "foto4.jpg", "foto5.jpg"];
 
 const SONG_DATABASE = {
